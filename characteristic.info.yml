@@ -1,0 +1,5 @@
+name: Characteristic
+description: Provides...
+
+type: module
+core_version_requirement: ^11.2
