@@ -1,0 +1,5 @@
+entity.characteristic.collection:
+  title: Characteristics
+  parent: system.admin_content
+  description: 'Manage characteristics.'
+  route_name: entity.characteristic.collection

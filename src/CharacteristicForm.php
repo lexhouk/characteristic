@@ -4,72 +4,43 @@ declare(strict_types=1);
 
 namespace Drupal\characteristic;
 
-use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
-use Drupal\Core\Entity\BundleEntityFormBase;
+use Drupal\characteristic\Entity\Characteristic;
+use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Base form for characteristic edit forms.
  */
-class CharacteristicForm extends BundleEntityFormBase {
+class CharacteristicForm extends ContentEntityForm {
 
   /**
-   * The characteristic storage.
+   * The entity label field parents.
    */
-  private ConfigEntityStorageInterface $storage;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container): static {
-    $instance = parent::create($container);
-
-    $instance->storage = $container->get('entity_type.manager')
-      ->getStorage('characteristic');
-
-    return $instance;
-  }
+  private const PARENTS = ['name', 'widget', 0, 'value'];
 
   /**
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state): array {
-    $characteristic = $this->entity;
+    $form = parent::form($form, $form_state);
 
-    $form['name'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Name'),
-      '#default_value' => $characteristic->label(),
-      '#maxlength' => 255,
-      '#required' => TRUE,
-    ];
+    NestedArray::setValue($form, [...static::PARENTS, '#id'], 'name');
 
-    $form['cid'] = [
+    $form['cid']['widget'][0]['value'] = [
+      ...$form['cid']['widget'][0]['value'],
       '#type' => 'machine_name',
-      '#default_value' => $characteristic->id(),
+      '#default_value' => $this->entity->id(),
+      '#disabled' => !$this->entity->isNew(),
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
       '#machine_name' => [
-        'exists' => [$this, 'exists'],
-        'source' => ['name'],
+        'exists' => [Characteristic::class, 'load'],
+        'source' => static::PARENTS,
       ],
     ];
 
-    return $this->protectBundleIdElement(parent::form($form, $form_state));
-  }
-
-  /**
-   * Determines if the characteristic already exists.
-   *
-   * @param string $cid
-   *   The characteristic ID.
-   *
-   * @return bool
-   *   TRUE if the characteristic exists, FALSE otherwise.
-   */
-  public function exists(string $cid): bool {
-    return $this->storage->load($cid) !== NULL;
+    return $form;
   }
 
   /**
