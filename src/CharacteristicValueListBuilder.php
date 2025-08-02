@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\characteristic;
 
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\Query\QueryInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -15,6 +17,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class CharacteristicValueListBuilder extends CharacteristicListBuilder {
 
   /**
+   * The currently active route match object.
+   */
+  private readonly RouteMatchInterface $routeMatch;
+
+  /**
    * {@inheritdoc}
    */
   public static function createInstance(
@@ -23,6 +30,7 @@ class CharacteristicValueListBuilder extends CharacteristicListBuilder {
   ): static {
     $instance = parent::createInstance($container, $entity_type);
 
+    $instance->routeMatch = $container->get('current_route_match');
     $instance->text = NULL;
 
     return $instance;
@@ -37,6 +45,16 @@ class CharacteristicValueListBuilder extends CharacteristicListBuilder {
     $headers['label'] = $this->t('Name');
 
     return $headers;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getEntityListQuery(): QueryInterface {
+    return parent::getEntityListQuery()->condition(
+      'characteristic',
+      $this->routeMatch->getRawParameter('characteristic'),
+    );
   }
 
 }

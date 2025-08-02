@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\characteristic;
 
-use Drupal\characteristic\Entity\Characteristic;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -18,7 +17,7 @@ class CharacteristicForm extends ContentEntityForm {
   /**
    * The entity label field parents.
    */
-  private const PARENTS = ['name', 'widget', 0, 'value'];
+  protected const array PARENTS = ['name', 'widget', 0, 'value'];
 
   /**
    * {@inheritdoc}
@@ -28,14 +27,16 @@ class CharacteristicForm extends ContentEntityForm {
 
     NestedArray::setValue($form, [...static::PARENTS, '#id'], 'name');
 
-    $form['cid']['widget'][0]['value'] = [
-      ...$form['cid']['widget'][0]['value'],
+    $key = ($type = $this->getEntity()->getEntityType())->getKey('id');
+
+    $form[$key]['widget'][0]['value'] = [
+      ...$form[$key]['widget'][0]['value'],
       '#type' => 'machine_name',
       '#default_value' => $this->entity->id(),
       '#disabled' => !$this->entity->isNew(),
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
       '#machine_name' => [
-        'exists' => [Characteristic::class, 'load'],
+        'exists' => [$type->getClass(), 'load'],
         'source' => static::PARENTS,
       ],
     ];

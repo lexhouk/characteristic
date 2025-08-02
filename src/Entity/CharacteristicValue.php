@@ -2,12 +2,15 @@
 
 namespace Drupal\characteristic\Entity;
 
-use Drupal\characteristic\CharacteristicForm;
+use Drupal\characteristic\CharacteristicValueDeleteForm;
+use Drupal\characteristic\CharacteristicValueForm;
 use Drupal\characteristic\CharacteristicValueListBuilder;
 use Drupal\characteristic\CharacteristicValueRouteProvider;
 use Drupal\Core\Entity\Attribute\ContentEntityType;
-use Drupal\Core\Entity\ContentEntityDeleteForm;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
 
 /**
  * Defines the characteristic value entity.
@@ -27,8 +30,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   handlers: [
     'list_builder' => CharacteristicValueListBuilder::class,
     'form' => [
-      'default' => CharacteristicForm::class,
-      'delete' => ContentEntityDeleteForm::class,
+      'default' => CharacteristicValueForm::class,
+      'delete' => CharacteristicValueDeleteForm::class,
     ],
     'route_provider' => [
       'html' => CharacteristicValueRouteProvider::class,
@@ -47,4 +50,38 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   translatable: TRUE,
   common_reference_target: TRUE,
 )]
-class CharacteristicValue extends CharacteristicBase {}
+class CharacteristicValue extends Characteristic {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function baseFieldDefinitions(
+    EntityTypeInterface $entity_type,
+  ): array {
+    $fields = parent::baseFieldDefinitions($entity_type);
+
+    $fields['characteristic'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Characteristic'))
+      ->setSetting('target_type', 'characteristic')
+      ->setTranslatable(TRUE)
+      ->setDefaultValueCallback(static::class . '::characteristic');
+
+    return $fields;
+  }
+
+  /**
+   * Default value callback for 'characteristic' base field.
+   */
+  public static function characteristic(): string {
+    return \Drupal::routeMatch()->getRawParameter('characteristic');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function toUrl($rel = NULL, array $options = []): Url {
+    return parent::toUrl($rel, $options)
+      ->setRouteParameter('characteristic', $this->characteristic());
+  }
+
+}

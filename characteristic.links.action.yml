@@ -3,3 +3,9 @@ entity.characteristic.add_form:
   title: 'Add characteristic'
   appears_on:
     - entity.characteristic.collection
+
+entity.characteristic_value.add_form:
+  route_name: entity.characteristic_value.add_form
+  title: 'Add characteristic value'
+  appears_on:
+    - entity.characteristic_value.collection
