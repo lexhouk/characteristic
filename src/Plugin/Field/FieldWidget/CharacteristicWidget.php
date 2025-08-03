@@ -148,7 +148,7 @@ class CharacteristicWidget extends OptionsSelectWidget {
     $type = $field_definition->getFieldStorageDefinition()
       ->getSetting('target_type');
 
-    return $type  === static::TYPE;
+    return $type === static::TYPE;
   }
 
 }

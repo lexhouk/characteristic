@@ -8,6 +8,7 @@ use Drupal\characteristic\CharacteristicValueForm;
 use Drupal\characteristic\CharacteristicValueListBuilder;
 use Drupal\characteristic\CharacteristicValueRouteProvider;
 use Drupal\Core\Entity\Attribute\ContentEntityType;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -85,5 +86,13 @@ class CharacteristicValue extends Characteristic {
     return parent::toUrl($rel, $options)
       ->setRouteParameter('characteristic', $this->characteristic());
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function preDelete(
+    EntityStorageInterface $storage,
+    array $entities,
+  ): void {}
 
 }

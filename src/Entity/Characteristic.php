@@ -12,6 +12,7 @@ use Drupal\Core\Entity\ContentEntityDeleteForm;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Routing\AdminHtmlRouteProvider;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -121,6 +122,35 @@ class Characteristic extends ContentEntityBase implements ContentEntityInterface
       ->setDefaultValue(0.0);
 
     return $fields;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function preDelete(
+    EntityStorageInterface $storage,
+    array $entities,
+  ): void {
+    $ids = \Drupal::entityQuery($type = 'characteristic_value')
+      ->accessCheck(FALSE)
+      ->condition(
+        'characteristic',
+        array_map(
+          fn(ContentEntityInterface $characteristic): string
+            => $characteristic->id(),
+          $entities,
+        ),
+        'IN',
+      )
+      ->execute();
+
+    if (!empty($ids)) {
+      $storage = \Drupal::entityTypeManager()->getStorage($type);
+
+      foreach ($ids as $id) {
+        $storage->delete([$storage->load($id)]);
+      }
+    }
   }
 
 }
