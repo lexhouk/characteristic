@@ -2,6 +2,7 @@
 
 namespace Drupal\characteristic\Entity;
 
+use Drupal\characteristic\CharacteristicValueAccessControlHandler;
 use Drupal\characteristic\CharacteristicValueDeleteForm;
 use Drupal\characteristic\CharacteristicValueForm;
 use Drupal\characteristic\CharacteristicValueListBuilder;
@@ -28,6 +29,7 @@ use Drupal\Core\Url;
     'owner' => 'uid',
   ],
   handlers: [
+    'access' => CharacteristicValueAccessControlHandler::class,
     'list_builder' => CharacteristicValueListBuilder::class,
     'form' => [
       'default' => CharacteristicValueForm::class,
