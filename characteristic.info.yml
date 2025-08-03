@@ -1,5 +1,5 @@
 name: Characteristic
-description: Provides...
+description: Provides a UI and custom widget for managing product characteristics and their values.
 
 type: module
 core_version_requirement: ^11.2
