@@ -1,6 +1,7 @@
 # Characteristic
 
-The characteristic provides...
+The characteristic provides a UI and custom widget for managing product
+characteristics and their values.
 
 For a full description of the module, visit the
 [project page](https://github.com/lexhouk/characteristic).
@@ -31,9 +32,9 @@ information, see
 
 ## Configuration
 
-The module has no menu or modifiable settings. There is no configuration. When
-enabled, the module will prevent the links from appearing. To get the links
-back, disable the module and clear caches.
+- Navigate to Administration > Extend and enable the module.
+
+- Manage entities in Administration > Content > Characteristics.
 
 
 ## Maintainers
